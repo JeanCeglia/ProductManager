@@ -25,7 +25,7 @@ app.get('/products', async (req, res) => {
     const prods = await productManager.getProducts();
     const limite = parseInt(limit);
     if(limit){
-        if (limite < 0) {
+        if (limite <= 0) {
             res.send("Ingrese un numero valido")
         } else {
             const prodsLimit = prods.slice(0, limit)
