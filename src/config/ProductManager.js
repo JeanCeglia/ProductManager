@@ -31,7 +31,7 @@ export class ProductManager {
 
     async getProducts(){
         const prods = JSON.parse(await fs.readFile(this.path, 'utf-8'));
-        return console.log(prods);
+        return prods;
     }
 
     //Buscamos por la propiedad code
@@ -44,7 +44,7 @@ export class ProductManager {
         if(!prod){
             return console.log('Not found');
         }else{
-            return console.log(prod);
+            return prod;
         }
 
     }
