@@ -42,7 +42,7 @@ export class ProductManager {
         )
 
         if(!prod){
-            return console.log('Not found');
+            return 'Product does not exist';
         }else{
             return prod;
         }
