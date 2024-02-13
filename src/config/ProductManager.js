@@ -1,4 +1,5 @@
 import {promises as fs} from "fs";
+import crypto from 'crypto';
 
 export class ProductManager {
     constructor(path){
@@ -20,12 +21,12 @@ export class ProductManager {
         const codigo = prods.find((prod) => prod.code === product.code)
 
         if(!codigo){
-            
+            product.id = crypto.randomBytes(10).toString('hex');
             prods.push(product);
             await fs.writeFile(this.path, JSON.stringify(prods))
-            return console.log('producto creado con exito.');
+            return 'producto creado con exito.';
         }else{
-            return console.log('El producto ya existe. ');
+            return 'El producto ya existe. ';
         }
     }
 
@@ -41,11 +42,7 @@ export class ProductManager {
             product.id === id
         )
 
-        if(!prod){
-            return 'Product does not exist';
-        }else{
-            return prod;
-        }
+        return prod;
 
     }
 
@@ -60,9 +57,9 @@ export class ProductManager {
             prods[indice].stock = nuevoProducto.stock
             prods[indice].price = nuevoProducto.price
             await fs.writeFile(this.path, JSON.stringify(prods))
-            return console.log('Producto actualizado con exito!')
+            return 'Producto actualizado con exito!';
         } else {
-            return console.log('El producto no existe')
+            return 'El producto no existe'
         }
 
     }
@@ -73,9 +70,9 @@ export class ProductManager {
         if (indice != -1) {
             const prodsFiltrados = prods.filter(prod => prod.id != id)
             await fs.writeFile(this.path, JSON.stringify(prodsFiltrados))
-            return console.log('Producto eliminado correctamente')
+            return 'Producto eliminado correctamente'
         } else {
-            return console.log('Producto no existe')
+            return 'Producto no existe';
         }
 
     }
