@@ -22,6 +22,7 @@ export class ProductManager {
 
         if(!codigo){
             product.id = crypto.randomBytes(10).toString('hex');
+            product.status = true;
             prods.push(product);
             await fs.writeFile(this.path, JSON.stringify(prods))
             return 'producto creado con exito.';
