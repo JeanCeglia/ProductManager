@@ -1,1 +1,11 @@
-[{"id":"8138d3365509fb3534de","quantity":7}]
+[
+  {
+    "id": 1,
+    "products": [
+      {
+        "pid": 871,
+        "quantity": 1
+      }
+    ]
+  }
+]

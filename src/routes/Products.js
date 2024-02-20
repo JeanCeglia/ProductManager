@@ -16,7 +16,11 @@ products.get('/', async (req, res) => {
         }
         
         const prodsLimit = prods.slice(0, limite)
-        res.status(200).send(prodsLimit)
+        res.status(200).render('products', {
+            mostrarProductos: true,
+            productos: prodsLimit,
+            css: 'product.css'
+        })
 
     }catch(error){
         res.status(500).send(`Error interno del servidor al consultar el cliente ${error}`);
