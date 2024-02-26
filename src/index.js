@@ -1,47 +1,43 @@
-import express from "express";
-import products from "./routes/Products.js";
-import carrito from "./routes/carrito.js";
+import express from "express"; // importa express
+import products from "./routes/Products.js"; //importamos la ruta productos
+import carrito from "./routes/carrito.js"; //importamos la ruta donde manipulamos el carrito
+import vista from "./routes/views.js";
 import upload from "./config/multer.js";
 import { Server } from "socket.io";
-import { engine } from "express-handlebars";
-import { __dirname } from "./path.js";
+import socketProducts from "./listeners/socketProducts.js";
+import { engine } from "express-handlebars"; //importamos el motor de plantillas
+import { __dirname } from "./path.js"; //importamos la ruta raiz de nuestro proyecto
 
 //settings
 const app = express();
-const PORT = 8000;
+const PORT = 8000; //guardamos el puerto a utilizar en nuestro proyecto en una constante
+const server = app.listen(PORT, () => {
+    try {
+        console.log(`Servert on port ${PORT}`);
+    } catch (error) {
+        console.log(error)
+    }
+});
 
-//server
-const server = []; 
+const socketServer = new Server(server);
+socketProducts(socketServer);
 
-const io = new Server(server);
 
 //Middlewares
-app.use(express.json());
-app.engine('handlebars', engine());
-app.set('view engine', 'handlebars');
-app.set('views', __dirname + '/views');
+app.use(express.json()); //hace que express use json
+//Config handlebars
+app.engine('handlebars', engine()); //indicamos la configuracion que va a tener el motor de plantillas
+app.set('views', __dirname + '/views');//donde se encuentran las plantillas
+app.set('view engine', 'handlebars');//le indico que lo use
+//end config handlebars
 
-io.on('con nection', (socket) => {
-    console.log('cliente conectado');
-    
-    socket.on('movimiento', info => { 
-        //Cuando el cliente me envia un mensaje, lo capturo y lo muestro
-        console.log(info)
-    })
-    
-    socket.on('rendirse', info => { 
-        //Cuando el cliente me envia un mensaje, lo capturo y lo muestro
-        console.log(info)
-        socket.emit('mensaje-jugador', "Te has rendido") //Cliente que envio este mensaje
-        socket.broadcast.emit('rendicion', "El jugador se rindio") //Clientes que tengan establecida la comunicacion con el servidor
-    })
-    
-});
 
 //Routes
 app.use('/static', express.static(__dirname + '/public'));
-app.use('/api/products', products, express.static(__dirname + '/public'));
+app.use('/api/products', products);
 app.use('/api/car', carrito);
+app.use("/", vista);
+
 app.post('/upload', upload.single('product'), (req, res) => {
     try {
         
@@ -54,22 +50,3 @@ app.post('/upload', upload.single('product'), (req, res) => {
     }
 });
 
-/* app.get('/static', (req, res) => {
-    
-    const prods = [
-        { id: 1, title: "Celular", price: 1500, img: "./img/17078660465233-4.png" },
-        { id: 2, title: "Televisor", price: 1800, img: "https://www.radiosapienza.com.ar/Image/0/500_500-526469_1.jpg" },
-        { id: 3, title: "Tablet", price: 1200, img: "https://www.radiosapienza.com.ar/Image/0/500_500-526469_1.jpg" },
-        { id: 4, title: "Notebook", price: 1900, img: "https://www.radiosapienza.com.ar/Image/0/500_500-526469_1.jpg" }
-    ]
-    
-    res.render('products', {
-        mostrarProductos: true,
-        productos: prods,
-        css: 'products.css'
-    })
-}) */
-
-app.listen(PORT, () => {
-    console.log(`Servert on port ${PORT}`);
-});

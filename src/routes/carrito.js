@@ -7,10 +7,10 @@ const carrito = Router();
 carrito.post("/:cid/products/:pid", async (req, res) => {
     try {
       const cid = parseInt(req.params.cid);
-      const pid = parseInt(req.params.pid);
+      const pid = req.params.pid;
   
       await carManagers.addProductToCart(cid, pid);
-      res.json({ status: "success", message: "Product added to cart successfully." });
+      res.status(200).json({ status: "success", message: "Product added to cart successfully." });
     } catch (error) {
       console.error("Error adding product to cart:", error);
       res.status(500).json({ status: "error", message: "Failed to add product to cart." });

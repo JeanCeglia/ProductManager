@@ -1,10 +1,10 @@
-import { Router } from "express";
-import { ProductManager } from "../config/ProductManager.js";
+import { Router } from "express"; //importamos el modulo de rutas de express
+import { ProductManager } from "../config/ProductManager.js"; //importamos la clase productManager
 
-const productManager = new ProductManager('./src/data/Products.json');
+const productManager = new ProductManager('./src/data/Products.json'); // le pasamos la ruta donde esta el archivo .json (nuestra base)
 const products = Router();
 
-products.get('/', async (req, res) => {
+products.get('/', async (req, res) => { //
     try{
 
         const { limit } = req.query;
@@ -16,11 +16,7 @@ products.get('/', async (req, res) => {
         }
         
         const prodsLimit = prods.slice(0, limite)
-        res.status(200).render('products', {
-            mostrarProductos: true,
-            productos: prodsLimit,
-            css: 'product.css'
-        })
+        res.status(200).send(prodsLimit);
 
     }catch(error){
         res.status(500).send(`Error interno del servidor al consultar el cliente ${error}`);
