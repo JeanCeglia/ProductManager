@@ -1,6 +1,6 @@
-import { ProductManager } from "../config/ProductManager.js";
-import { __dirname } from "../path.js";
-const pm = new ProductManager(__dirname + "./data/products.json");
+/* import { ProductManager } from "../config/ProductManager.js";
+import { __dirname } from "../path.js"; */
+/* const pm = new ProductManager("./src/data/products.json");
 
 const socketProducts = (socketServer) => {
   socketServer.on("connection", async (socket) => {
@@ -21,6 +21,6 @@ const socketProducts = (socketServer) => {
       socketServer.emit("enviodeproducts", listadeproductos);
     });
   });
-};
+}; */
 
 export default socketProducts;

@@ -1,26 +1,17 @@
 import express from "express"; // importa express
+import { Server } from "socket.io";
 import products from "./routes/Products.js"; //importamos la ruta productos
 import carrito from "./routes/carrito.js"; //importamos la ruta donde manipulamos el carrito
 import vista from "./routes/views.js";
+import { ProductManager } from "./config/ProductManager.js";
 import upload from "./config/multer.js";
-import { Server } from "socket.io";
-import socketProducts from "./listeners/socketProducts.js";
+//import socketProducts from "./listeners/socketProducts.js";
 import { engine } from "express-handlebars"; //importamos el motor de plantillas
 import { __dirname } from "./path.js"; //importamos la ruta raiz de nuestro proyecto
 
 //settings
 const app = express();
 const PORT = 8000; //guardamos el puerto a utilizar en nuestro proyecto en una constante
-const server = app.listen(PORT, () => {
-    try {
-        console.log(`Servert on port ${PORT}`);
-    } catch (error) {
-        console.log(error)
-    }
-});
-
-const socketServer = new Server(server);
-socketProducts(socketServer);
 
 
 //Middlewares
@@ -50,3 +41,37 @@ app.post('/upload', upload.single('product'), (req, res) => {
     }
 });
 
+const server = app.listen(PORT, () => {
+    try {
+        console.log(`Servert on port ${PORT}`);
+    } catch (error) {
+        console.log(error)
+    }
+});
+
+const socketServer = new Server(server);
+
+const pm = new ProductManager("./data/products.json");
+
+const socketProducts = (socketServer) => {
+    socketServer.on("connection", async (socket) => {
+        console.log("client connected con ID:", socket.id);
+        const listadeproductos = await pm.getProducts();
+        
+        socketServer.emit("enviodeproducts", listadeproductos);
+        
+        socket.on("addProduct", async (obj) => {
+            await pm.addProduct(obj);
+            const listadeproductos = await pm.getProducts();
+            socketServer.emit("enviodeproducts", listadeproductos);
+        });
+        
+        socket.on("deleteProduct", async (id) => {
+            await pm.deleteProduct(id);
+            const listadeproductos = await pm.getProducts();
+            socketServer.emit("enviodeproducts", listadeproductos);
+        });
+    });
+};
+
+socketProducts(socketServer);
