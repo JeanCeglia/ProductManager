@@ -1,14 +1,13 @@
 import { Router } from "express"; //importamos el modulo de rutas de express
-import { ProductManager } from "../config/ProductManager.js"; //importamos la clase productManager
+import productModel from "../models/productModel.js";
 
-const productManager = new ProductManager('./src/data/Products.json'); // le pasamos la ruta donde esta el archivo .json (nuestra base)
 const products = Router();
 
 products.get('/', async (req, res) => { //
     try{
 
         const { limit } = req.query;
-        const prods = await productManager.getProducts();
+        const prods = await productModel.find().lean()
         let limite = parseInt(limit);
 
         if(!limite){
@@ -29,7 +28,7 @@ products.get('/:pid', async (req, res) => {
     try {
         
         const idProducto = req.params.pid;
-        const prod = await productManager.getProductsById(idProducto);
+        const prod = await productModel.findById(idProducto);
         if(prod){
             res.status(200).send(prod);
         }else{
@@ -44,7 +43,7 @@ products.get('/:pid', async (req, res) => {
 products.post('/', async (req, res) => {
     try {
         const product = req.body;
-        const mensaje = await productManager.addProduct(product);
+        const mensaje = await productModel.create(product);
         if(mensaje == 'producto creado con exito.'){
             res.status(200).send(mensaje);
         }else{
@@ -60,11 +59,11 @@ products.put('/:pid', async (req, res) => {
     try {
         const idProducto = req.params.pid;
         const updateProduct = req.body
-        const mensaje = await productManager.updateProduct(idProducto, updateProduct)
+        const mensaje = await productModel.findByIdAndUpdate(idProducto, updateProduct);
         if(mensaje == 'Producto actualizado con exito!'){
             res.status(200).send(mensaje);
         }else{
-            res.status(404).send(mensaje)
+            res.status(404).send(mensaje);
         }
     } catch (error) {
         res.status(500).send(`Error interno al actualizar el producto ${error}`)
@@ -74,7 +73,7 @@ products.put('/:pid', async (req, res) => {
 products.delete('/:pid', async (req, res) => {
     try {
         const idProducto = req.params.pid
-        const mensaje = await productManager.deleteProduct(idProducto)
+        const mensaje = await productModel.findByIdAndDelete(idProducto)
         if (mensaje == "Producto eliminado correctamente"){
             res.status(200).send(mensaje)
         }

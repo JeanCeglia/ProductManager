@@ -1,39 +1,51 @@
 import { Router } from "express";
-import { CarManagers } from "../config/carManagers.js";
+import cartModel from "../models/cartModel.js";
 
-const carManagers = new CarManagers('./src/data/carrito.json');
 const carrito = Router();
 
-carrito.post("/:cid/products/:pid", async (req, res) => {
-    try {
-      const cid = parseInt(req.params.cid);
-      const pid = req.params.pid;
-  
-      await carManagers.addProductToCart(cid, pid);
-      res.status(200).json({ status: "success", message: "Product added to cart successfully." });
-    } catch (error) {
-      console.error("Error adding product to cart:", error);
-      res.status(500).json({ status: "error", message: "Failed to add product to cart." });
-    }
-});
-
 carrito.post("/", async (req, res) => {
-    const newcart = await carManagers.addCart();
-     res.json({ status: "success", newcart });
+  try {
+    const newcart = await cartModel.create({ products: [] });
+    res.status(200).send(newcart);
+  } catch (e) {
+    res.status(500).send(`Error inesperado al crear el carrito ${e}`);
+  }
 });
 
-carrito.get('/', async (req, res) => {
-    try {
-        const car = await carManagers.getCarts()
-        res.status(200).send(car)
-    } catch (error) {
-        res.status(500).send(`Error interno del servidor al consultar carrito: ${error}`)
-    }
-})
+carrito.post("/:cid/products/:pid", async (req, res) => {
+  try {
+    const cid = req.params.cid;
+    const pid = req.params.pid;
+    const { quantity } = req.body;
 
-carrito.get("/:cid", async (req,res)=>{
-    const carritofound=await carManagers.getCartbyId(req.params)
-    res.json({status:"success",carritofound})
-})
+    const cart = await cartModel.findById(cid);
+    const index = cart.products.findIndex((product) => product.id_prod == pid);
+
+    if (index != -1) {
+      //Consultar Stock para ver cantidades
+      cart.products[index].quantity = quantity; //5 + 5 = 10, asigno 10 a quantity
+    } else {
+      cart.products.push({ id_prod: pid, quantity: quantity });
+    }
+    const mensaje = await cartModel.findByIdAndUpdate(cid, cart);
+    res.status(200).send(mensaje);
+  } catch (error) {
+    res
+      .status(500)
+      .send(`Error interno del servidor al crear producto: ${error}`);
+  }
+});
+
+carrito.get("/:cid", async (req, res) => {
+  try {
+    const cartId = req.params.cid;
+    const cart = await cartModel.findById(cartId);
+    res.status(200).send(cart);
+  } catch (error) {
+    res
+      .status(500)
+      .send(`Error interno del servidor al consultar carrito: ${error}`);
+  }
+});
 
 export default carrito;
