@@ -4,7 +4,6 @@ import carrito from "./routes/carrito.js"; //importamos la ruta donde manipulamo
 import chatRouter from "./routes/chatRouter.js";
 import user from "./routes/user.js";
 import vista from "./routes/views.js";
-import { ProductManager } from "./config/ProductManager.js";
 import upload from "./config/multer.js";
 //import socketProducts from "./listeners/socketProducts.js";
 import mongoose from "mongoose";
@@ -58,9 +57,7 @@ const server = app.listen(PORT, () => {
 });
 
 const socketServer = new Server(server);
-
-const pm = new ProductManager("./data/products.json");
-
+//esto tengo que trabajarlo, no me esta funcionando
 const socketProducts = (socketServer) => {
     socketServer.on("connection", async (socket) => {
         console.log("client connected con ID:", socket.id);
