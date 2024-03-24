@@ -1,3 +1,5 @@
+const socket = io()
+
 const chatBox = document.getElementById('chatBox')
 const messageLogs = document.getElementById('messageLogs')
 let user
@@ -9,7 +11,7 @@ Swal.fire({
     inputValidator: (valor) => {
         return !valor && 'Ingrese un valor valido'
     },
-    allowOutsideClick: true
+    allowOutsideClick: false
 }).then(resultado => {
     user = resultado.value
     console.log(user)
