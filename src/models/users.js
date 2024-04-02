@@ -9,6 +9,11 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        unique: true,
+        index: true
+    },
     password: {
         type: String,
         required: true
@@ -16,11 +21,6 @@ const userSchema = new Schema({
     age: {
         type: Number,
         required: true
-    },
-    email: {
-        type: String,
-        unique: true,
-        index: true
     },
     rol: {
         type: String,
