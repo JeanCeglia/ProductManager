@@ -43,7 +43,7 @@ sessionRouter.post('/register', async (req, res) => {
 })
 
 sessionRouter.get('/logout', (req, res) => {
-    req.session.destroy(function (e) {
+    req.session.destroy(function(e) {
         if (e) {
             console.log(e)
         } else {
