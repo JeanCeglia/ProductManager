@@ -1,45 +1,36 @@
 import { Router } from "express";
-import { userModel } from "../models/users.js";
+import passport from "passport";
 
-const sessionRouter = Router()
+const sessionRouter = Router();
 
-sessionRouter.get('/login', async (req, res) => {
-    const { email, password } = req.body
-
+sessionRouter.get('/login', passport.authenticate('login'), async (req, res) => {
     try {
-        const user = await userModel.findOne({ email: email }).lean()
-        if (user && password == user.password) {
-            req.session.email = email
-            if (user.rol == "Admin") {
-                req.session.admin = true
-                res.status(200).send("Usuario Admin logueado correctamente")
-            } else {
-                res.status(200).send("Usuario logueado correctamente")
-            }
-        } else {
-            res.status(401).send("Usuario o contraseña no validos")
+        if(!req.user){
+            return res.status(401).send("Usuario o contrase;a no valido");
         }
-    } catch (e) {
-        res.status(500).send("Error al loguear usuario", e)
-    }
-})
-
-sessionRouter.post('/register', async (req, res) => {
-    try {
-        const { first_name, last_name, email, password, age } = req.body
-        const findUser = await userModel.findOne({ email: email })
-        if (findUser) {
-            res.status(400).send("Ya existe un usuario con este mail")
-        } else {
-            await userModel.create({ first_name, last_name, email, password, age })
-            res.status(200).send("Usuario creado correctamente")
+        
+        req.session.user = {
+            email: req.user.email,
+            first_name: req.user.first_name
         }
 
+        res.status(200).send("Usuario logueado correctamente");
     } catch (e) {
-        res.status(500).send("Error al registrar users: ", e)
+        res.status(500).send(`Error al loguearte ${e}`);
     }
+});
 
+sessionRouter.post('/register', passport.authenticate('register'), async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(400).send("Usuario ya existente en la aplicacion")
+        }
 
+        res.status(200).send("Usuario creado correctamente")
+
+    } catch (e) {
+        res.status(500).send("Error al registrar usuario")
+    }
 })
 
 sessionRouter.get('/logout', (req, res) => {

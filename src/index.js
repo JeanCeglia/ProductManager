@@ -1,10 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import MongoStore from "connect-mongo";
+import passport from "passport";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import messageModel from "./models/messages.js";
 import indexRouter from "./routes/indexRouter.js";
+import initializePassport from "./config/passport/passport.js";
 import { Server } from "socket.io";
 import { engine } from "express-handlebars";
 import { __dirname } from "./path.js";
@@ -43,6 +45,11 @@ app.use(cookieParser('claveOculta'));
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", __dirname + "/views");
+
+//PASSPORT
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Routers
 app.use("/", indexRouter);
